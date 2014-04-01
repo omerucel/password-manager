@@ -1,3 +1,5 @@
+var DROPBOX_KEY = 'y2wcqthd1fi73hr';
+
 (function(){
     // Application
     window.App = {
@@ -5,7 +7,16 @@
         Views: {},
         Models: {},
         Collections: {},
-        Instances: {}
+        Instances: {},
+        Helpers: {
+            requireAuthentication: function(callback) {
+                if (App.Instances.dropboxClient.isAuthenticated()) {
+                    callback();
+                } else {
+                    App.Instances.router.navigate('login', {trigger: true, reload: true});
+                }
+            }
+        }
     };
 
     // Account Model
@@ -24,7 +35,15 @@
     App.Collections.Accounts = Backbone.Collection.extend({
         model: App.Models.Account,
 
-        localStorage: new Backbone.LocalStorage('AccountCollection'),
+        dropboxDatastore: new Backbone.DropboxDatastore('AccountsCollection', {
+            datastoreId: 'accounts'
+        }),
+
+        //localStorage: new Backbone.LocalStorage('AccountCollection'),
+
+        initialize: function(){
+            this.dropboxDatastore.syncCollection(this);
+        },
 
         comparator: function(account){
             return account.get('accountName');
@@ -36,9 +55,6 @@
         className: 'login-page',
 
         template: Handlebars.compile($('#login-template').html()),
-
-        initialize: function(){
-        },
 
         events: {
             "click .action-login": "actionLogin"
@@ -52,7 +68,7 @@
         actionLogin: function (){
             var self = this;
 
-            App.Instances.DropboxClient.authenticate(function(error){
+            App.Instances.dropboxClient.authenticate(function(error){
                 if (error) {
                     alert('Authentication error: ' + error);
                     return;
@@ -73,6 +89,7 @@
             "click .action-open-copy-popup": "actionOpenCopyPopup",
             "click .action-show-note": "actionShowNote",
             "click .action-remove": "actionRemove",
+            "click .action-edit": "actionEdit"
         },
 
         render: function(){
@@ -94,6 +111,10 @@
 
         actionShowNote: function(){
             App.Instances.router.navigate('note/' + this.model.get('id'), {trigger: true, replace: true});
+        },
+
+        actionEdit: function(){
+            App.Instances.router.navigate('save-account/' + this.model.get('id'), {trigger: true, replace: true});
         },
 
         actionRemove: function(){
@@ -156,12 +177,11 @@
         },
 
         actionNewAccount: function(){
-            App.Instances.router.navigate('save-account', true);
+            App.Instances.router.navigate('save-account', {trigger: true, reload: true});
         },
 
         actionLogout: function(){
-            App.Instances.DropboxClient.signOff();
-            App.Instances.router.navigate('login', true);
+            App.Instances.router.navigate('login', {trigger: true, reload: true});
         },
 
         actionSearch: function(){
@@ -185,7 +205,8 @@
         },
 
         render: function(){
-            this.$el.html(this.template({}));
+            console.log(this.model.toJSON());
+            this.$el.html(this.template(this.model.toJSON()));
             return this;
         },
 
@@ -194,16 +215,16 @@
         },
 
         actionSave: function(){
-            var self = this;
-            var account = new App.Models.Account({
-                accountName: this.$('input[name=account_name]').val(),
-                username: this.$('input[name=username]').val(),
-                password: this.$('input[name=password]').val(),
-                note: this.$('textarea[name=note]').val()
-            });
-            self.collection.add(account);
-            account.save();
+            this.model.set('accountName', this.$('input[name=account_name]').val());
+            this.model.set('username', this.$('input[name=username]').val());
+            this.model.set('password', this.$('input[name=password]').val());
+            this.model.set('note', this.$('textarea[name=note]').val());
 
+            if (!this.collection.contains(this.model)) {
+                this.collection.add(this.model);
+            }
+
+            this.model.save();
             App.Instances.router.navigate('home', {trigger: true, replace: true});
         },
 
@@ -233,6 +254,11 @@
         }
     });
 
+    // Dropbox Client
+    App.Instances.dropboxClient = new Dropbox.Client({key: DROPBOX_KEY});
+    App.Instances.dropboxClient.authenticate({interactive: false});
+    Backbone.DropboxDatastore.client = App.Instances.dropboxClient;
+
     // Collections Instances
     App.Instances.accountsCollection = new App.Collections.Accounts();
 
@@ -244,6 +270,7 @@
             "login": "login",
             "home": "home",
             "save-account": "saveAccount",
+            "save-account/:id": "saveAccount",
             "note/:id": "note",
             "*actions": "defaultRoute"
         }
@@ -252,31 +279,49 @@
     App.Instances.router = new App.Router();
     App.Instances.router.on('route:login', function(){
         console.log('route:login');
+
+        if (App.Instances.dropboxClient.isAuthenticated()) {
+            App.Instances.dropboxClient.signOff();
+        }
         var view = new App.Views.Login();
         $('#app').html(view.render().el);
     });
 
     App.Instances.router.on('route:home', function(){
         console.log('route:home');
-        var view = new App.Views.Home({ collection: App.Instances.accountsCollection });
-        $('#app').html(view.render().el);
+
+        App.Helpers.requireAuthentication(function(){
+            var view = new App.Views.Home({ collection: App.Instances.accountsCollection });
+            $('#app').html(view.render().el);
+        });
     });
 
-    App.Instances.router.on('route:saveAccount', function(){
+    App.Instances.router.on('route:saveAccount', function(accountId){
         console.log('route:saveAccount');
-        var view = new App.Views.SaveAccount({ collection: App.Instances.accountsCollection });
-        $('#app').html(view.render().el);
+
+        App.Helpers.requireAuthentication(function(){
+            var account = App.Instances.accountsCollection.get(accountId);
+            if (account == null) {
+                account = new App.Models.Account();
+            }
+
+            var view = new App.Views.SaveAccount({ collection: App.Instances.accountsCollection, model: account });
+            $('#app').html(view.render().el);
+        });
     });
 
     App.Instances.router.on('route:note', function(accountId){
         console.log('route:note');
-        var account = App.Instances.accountsCollection.get(accountId);
-        if (account == null) {
-            App.Instances.router.navigate('home', {trigger: true, replace: true});
-        } else {
-            var view = new App.Views.Note({model: account});
-            $('#app').html(view.render().el);
-        }
+
+        App.Helpers.requireAuthentication(function(){
+            var account = App.Instances.accountsCollection.get(accountId);
+            if (account == null) {
+                App.Instances.router.navigate('home', {trigger: true, replace: true});
+            } else {
+                var view = new App.Views.Note({model: account});
+                $('#app').html(view.render().el);
+            }
+        });
     });
 
     App.Instances.router.on('route:defaultRoute', function(actions){

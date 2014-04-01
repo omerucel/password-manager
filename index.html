@@ -65,15 +65,15 @@
                     <legend>User Information</legend>
                     <div class="form-item">
                         <label class="form-item-label">Account Name</label>
-                        <input type="text" name="account_name" />
+                        <input type="text" name="account_name" value="{{ accountName }}" />
                     </div>
                     <div class="form-item">
                         <label class="form-item-label">Username</label>
-                        <input type="text" name="username" />
+                        <input type="text" name="username" value="{{ username }}" />
                     </div>
                     <div class="form-item">
                         <label class="form-item-label">Password</label>
-                        <input type="text" name="password" />
+                        <input type="text" name="password" value="{{ password }}" />
                         <div class="password-buttons">
                             <a href="javascript:;" class="action-generate-password"><span class="fa fa-repeat"></span> Generate Password</a>
                         </div>
@@ -82,7 +82,7 @@
                 <fieldset>
                     <legend>Note</legend>
                     <div class="form-item">
-                        <textarea rows="5" name="note"></textarea>
+                        <textarea rows="5" name="note">{{ note }}</textarea>
                     </div>
                 </fieldset>
                 <div class="form-item">
@@ -110,7 +110,7 @@
     <script type="text/javascript" src="assets/js/underscore-min.js"></script>
     <script type="text/javascript" src="assets/js/handlebars-1.1.2.js"></script>
     <script type="text/javascript" src="assets/js/backbone-min.js"></script>
-    <script type="text/javascript" src="assets/js/backbone.localStorage-min.js"></script>
+    <!--<script type="text/javascript" src="assets/js/backbone.localStorage-min.js"></script>-->
     <script type="text/javascript" src="assets/js/backbone.dropboxDatastore.min.js"></script>
     <script type="text/javascript" src="app.js"></script>
 </body>
