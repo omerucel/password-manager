@@ -11,10 +11,20 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
         Helpers: {
             requireAuthentication: function(callback) {
                 if (App.Instances.dropboxClient.isAuthenticated()) {
-                    callback();
+                    if (!App.Instances.masterPassword) {
+                        App.Instances.router.navigate('master-password-login', {trigger: true, reload: true});
+                    } else {
+                        callback();
+                    }
                 } else {
                     App.Instances.router.navigate('login', {trigger: true, reload: true});
                 }
+            },
+            encrypt: function(value){
+                return CryptoJS.RC4.encrypt(value, App.Instances.masterPassword).toString(CryptoJS.enc.Utf8);
+            },
+            decrypt: function(value) {
+                return CryptoJS.RC4.decrypt(value, App.Instances.masterPassword).toString(CryptoJS.enc.Utf8);
             }
         }
     };
@@ -28,6 +38,30 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
                 password: '',
                 note: ''
             }
+        },
+
+        decryptedUsername: function() {
+            if (this.get('username').length > 0) {
+                return App.Helpers.decrypt(this.get('username'));
+            } else {
+                return '';
+            }
+        },
+
+        decryptedPassword: function() {
+            if (this.get('password').length > 0) {
+                return App.Helpers.decrypt(this.get('password'));
+            } else {
+                return '';
+            }
+        },
+
+        decryptedNote: function() {
+            if (this.get('note').length > 0) {
+                return App.Helpers.decrypt(this.get('note'));
+            } else {
+                return '';
+            }
         }
     });
 
@@ -38,8 +72,6 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
         dropboxDatastore: new Backbone.DropboxDatastore('AccountsCollection', {
             datastoreId: 'accounts'
         }),
-
-        //localStorage: new Backbone.LocalStorage('AccountCollection'),
 
         initialize: function(){
             this.dropboxDatastore.syncCollection(this);
@@ -66,8 +98,6 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
         },
 
         actionLogin: function (){
-            var self = this;
-
             App.Instances.dropboxClient.authenticate(function(error){
                 if (error) {
                     alert('Authentication error: ' + error);
@@ -76,6 +106,27 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
 
                 App.Instances.router.navigate('home', {trigger: true, replace: true});
             });
+        }
+    });
+
+    // Master Password View
+    App.Views.MasterPassword = Backbone.View.extend({
+        className: 'master-password-login-page',
+
+        template: Handlebars.compile($('#master-password-login-template').html()),
+
+        events: {
+            "click .action-login": "actionLogin"
+        },
+
+        render: function(){
+            this.$el.html(this.template({}));
+            return this;
+        },
+
+        actionLogin: function(){
+            App.Instances.masterPassword = this.$('input[name=master_password]').val();
+            App.Instances.router.navigate('home', {trigger: true, replace: true});
         }
     });
 
@@ -98,8 +149,8 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
         },
 
         actionOpenCopyPopup: function(){
-            $('#copy-popup .username span').html(this.model.get('username'));
-            $('#copy-popup .password span').html(this.model.get('password'));
+            $('#copy-popup .username span').html(this.model.decryptedUsername());
+            $('#copy-popup .password span').html(this.model.decryptedPassword());
 
             $.magnificPopup.open({
                 items: {
@@ -205,8 +256,12 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
         },
 
         render: function(){
-            console.log(this.model.toJSON());
-            this.$el.html(this.template(this.model.toJSON()));
+            this.$el.html(this.template({
+                accountName: this.model.get('accountName'),
+                username: this.model.decryptedUsername(),
+                password: this.model.decryptedPassword(),
+                note: this.model.decryptedNote()
+            }));
             return this;
         },
 
@@ -215,10 +270,14 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
         },
 
         actionSave: function(){
+            var encryptedUsername = App.Helpers.encrypt(this.$('input[name=username]').val());
+            var encryptedPassword = App.Helpers.encrypt(this.$('input[name=password]').val());
+            var encryptedNote = App.Helpers.encrypt(this.$('textarea[name=note]').val());
+
             this.model.set('accountName', this.$('input[name=account_name]').val());
-            this.model.set('username', this.$('input[name=username]').val());
-            this.model.set('password', this.$('input[name=password]').val());
-            this.model.set('note', this.$('textarea[name=note]').val());
+            this.model.set('username', encryptedUsername);
+            this.model.set('password', encryptedPassword);
+            this.model.set('note', encryptedNote);
 
             if (!this.collection.contains(this.model)) {
                 this.collection.add(this.model);
@@ -248,8 +307,7 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
         },
 
         render: function(){
-            var note = this.model.get('note');
-            this.$el.html(this.template({note: note}));
+            this.$el.html(this.template({note: this.model.decryptedNote()}));
             return this;
         }
     });
@@ -268,6 +326,7 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
     App.Router = Backbone.Router.extend({
         routes: {
             "login": "login",
+            "master-password-login": "masterPasswordLogin",
             "home": "home",
             "save-account": "saveAccount",
             "save-account/:id": "saveAccount",
@@ -280,10 +339,18 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
     App.Instances.router.on('route:login', function(){
         console.log('route:login');
 
+        App.Instances.masterPassword = null;
         if (App.Instances.dropboxClient.isAuthenticated()) {
             App.Instances.dropboxClient.signOff();
         }
         var view = new App.Views.Login();
+        $('#app').html(view.render().el);
+    });
+
+    App.Instances.router.on('route:masterPasswordLogin', function(){
+        console.log('route:masterPasswordLogin');
+
+        var view = new App.Views.MasterPassword();
         $('#app').html(view.render().el);
     });
 

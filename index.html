@@ -14,6 +14,20 @@
         </div>
     </script>
 
+    <script type="text/x-handlebars-template" id="master-password-login-template">
+        <div class="content">
+            <form>
+                <div class="form-item">
+                    <label class="form-item-label">Master Password</label>
+                    <input type="password" name="master_password" />
+                </div>
+                <div class="form-item">
+                    <a href="javascript:;" class="action-login"><span class="fa fa-unlock"></span> Unlock</a>
+                </div>
+            </form>
+        </div>
+    </script>
+
     <script type="text/x-handlebars-template" id="home-template">
         <div id="copy-popup" class="white-popup mfp-hide">
             <div class="username">
@@ -103,6 +117,7 @@
         </div>
     </script>
 
+    <script type="text/javascript" src="assets/js/rc4.js"></script>
     <script type="text/javascript" src="assets/js/password-generator.min.js"></script>
     <script type="text/javascript" src="assets/js/dropbox-datastores-1.0.0.js"></script>
     <script type="text/javascript" src="assets/js/jquery-2.1.0.min.js"></script>
@@ -110,7 +125,6 @@
     <script type="text/javascript" src="assets/js/underscore-min.js"></script>
     <script type="text/javascript" src="assets/js/handlebars-1.1.2.js"></script>
     <script type="text/javascript" src="assets/js/backbone-min.js"></script>
-    <!--<script type="text/javascript" src="assets/js/backbone.localStorage-min.js"></script>-->
     <script type="text/javascript" src="assets/js/backbone.dropboxDatastore.min.js"></script>
     <script type="text/javascript" src="app.js"></script>
 </body>
