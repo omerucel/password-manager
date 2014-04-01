@@ -1,0 +1,41 @@
+.action-bar{
+  position: absolute;
+  width: 100%;
+  bottom: 0px;
+  padding: 10px;
+  box-sizing:border-box;
+  background: #FE6D58;
+  border-top: 5px solid #EA5D50;
+
+  ul{
+    @include clearfix;
+
+    li{
+      float: left;
+
+      &.right{
+        float: right;
+      }
+
+      a{
+        display: block;
+        padding: 4px;
+        color: #ffffff;
+        margin-right: 5px;
+        font-size: em(15);
+        text-decoration: none;
+        font-family: "hn-regular";
+
+        .fa{
+          font-size: em(18);
+        }
+      }
+
+      &:last-child{
+        a{
+          margin-right: 0px;
+        }
+      }
+    }
+  }
+}

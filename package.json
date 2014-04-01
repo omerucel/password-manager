@@ -1,0 +1,8 @@
+{
+    "name": "password-manager",
+    "version": "0.1.0",
+    "dependencies": {
+        "grunt-contrib-connect": "latest",
+        "grunt-contrib-compass": "latest"
+    }
+}

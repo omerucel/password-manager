@@ -1,0 +1,15 @@
+.login-page{
+  .content{
+    width: 100%;
+    top: 80px;
+    bottom: 0px;
+    overflow-y: auto;
+    text-align: center;
+  }
+
+  .action-login{
+    @include green-button();
+    display: inline-block;
+    padding: 10px;
+  }
+}

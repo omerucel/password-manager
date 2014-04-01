@@ -1,0 +1,77 @@
+$fa-font-path: "../font";
+
+@import "bourbon/bourbon";
+@import "fontawesome/font-awesome";
+@import "mixins";
+@import "reset";
+@import "font";
+@import "form";
+@import "magnific-popup";
+
+// Widgets
+@import "search-bar";
+@import "action-bar";
+@import "accounts";
+
+// Pages
+@import "home-page";
+@import "note-page";
+@import "save-account-page";
+@import "login-page";
+
+html, body{
+  font-family: "hn-regular";
+  background: #fff;
+  height: 100%;
+}
+
+.content{
+  width: 100%;
+  position: absolute;
+  top: 55px;
+  bottom: 50px;
+  overflow-y: auto;
+}
+
+.container{
+}
+
+header.page-header{
+  padding: 10px;
+  background: #FE6D58;
+
+  ul{
+    li{
+      a{
+        text-decoration: none;
+        color: #fff;
+        font-family: "hn-bold";
+
+        .fa{
+          font-size: em(18);
+        }
+      }
+    }
+  }
+}
+
+ul.popup-menu{
+  margin-top: 20px;
+  li{
+    a{
+      @include green-button();
+
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+  }
+}
+
+.white-popup {
+    position: relative;
+    background: #FFF;
+    padding: 20px;
+    width: auto;
+    max-width: 500px;
+    margin: 20px auto;
+}

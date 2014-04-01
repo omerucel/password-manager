@@ -1,0 +1,35 @@
+@mixin flat-button($background-color, $border-color, $color, $font-size) {
+  @include border-top-radius(5px);
+  @include border-bottom-radius(5px);
+  display: block;
+  font-size: em($font-size);
+  font-family: 'hn-light';
+  background: $background-color;
+  border: 1px solid $border-color;
+  color: $color;
+  text-decoration: none;
+
+  &:hover{
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    color: #000;
+  }
+}
+
+@mixin green-button($font-size:16) {
+  @include flat-button(#00CDAE, #00B89C, #fff, $font-size);
+}
+
+@mixin orange-button($font-size:16) {
+  @include flat-button(#FE6D58, #FF5661, #fff, $font-size);
+}
+
+@mixin grey-button($font-size:16) {
+  @include flat-button(#f0f0f0, #ddd, #000, $font-size);
+
+  &:hover{
+    background: #000;
+    border: 1px solid #000;
+    color: #fff;
+  }
+}

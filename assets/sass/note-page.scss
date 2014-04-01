@@ -1,0 +1,16 @@
+.note-page{
+  .content{
+    width: 100%;
+    top: 40px;
+    bottom: 0px;
+    overflow-y: auto;
+  }
+
+  .note{
+    padding: 10px;
+
+    p{
+      margin-bottom: 10px;
+    }
+  }
+}

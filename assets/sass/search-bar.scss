@@ -1,0 +1,27 @@
+.search-bar{
+  position: absolute;
+  width: 100%;
+  padding: 10px;
+  box-sizing:border-box;
+
+  input{
+    width: 100%;
+    padding: 8px;
+    border:0px;
+    font-size: em(15);
+    outline: none;
+    box-sizing:border-box;
+    font-family: "hn-light";
+    @include border-top-radius(5px);
+    @include border-bottom-radius(5px);
+    border: 1px solid #ddd;
+  }
+
+  .fa-search{
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: em(18);
+    color: #aaa;
+  }
+}

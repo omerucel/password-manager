@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Password Manager</title>
+    <link rel="stylesheet" href="assets/style/app.css" />
+</head>
+<body>
+    <div id="app"></div>
+
+    <script type="text/x-handlebars-template" id="login-template">
+        <div class="content">
+            <a href="javascript:;" class="action-login"><span class="fa fa-sign-in"></span> Login With Dropbox</a>
+        </div>
+    </script>
+
+    <script type="text/x-handlebars-template" id="home-template">
+        <div id="copy-popup" class="white-popup mfp-hide">
+            <div class="username">
+                <strong>Username</strong> <span></span>
+            </div>
+            <div class="password">
+                <strong>Password</strong> <span></span>
+            </div>
+        </div>
+        <section class="search-bar">
+            <input type="text" name="q" placeholder="Search an account" autocomplete="off" />
+            <span class="fa fa-search"></span>
+        </section>
+        <div class="content">
+            <div class="accounts"></div>
+            <div class="empty-message">List is empty!</div>
+        </div>
+        <section class="action-bar">
+            <ul>
+                <li><a href="javascript:;" class="action-new-account"><span class="fa fa-plus-square-o"></span>&nbsp;Add New Account</a></li>
+                <li class="right"><a href="javascript:;" class="action-logout"><span class="fa fa-sign-out"></span> Logout</a></li>
+            </ul>
+        </section>
+    </script>
+
+    <script type="text/x-handlebars-template" id="account-template">
+        <div class="account-name">{{accountName}}</div>
+        <div class="actions">
+            <ul class="copy-menu">
+                <li><a href="javascript:;" class="action-open-copy-popup"><span class="fa fa-clipboard"></span> Copy</a></li>
+                <li><a href="javascript:;" class="action-show-note"><span class="fa fa-eye"></span> Show Note</a></li>
+            </ul>
+            <ul class="settings-menu">
+                <li><a href="javascript:;" class="action-edit"><span class="fa fa-edit"></span></a></li>
+                <li><a href="javascript:;" class="action-remove"><span class="fa fa-trash-o"></span></a></li>
+            </ul>
+        </div>
+    </script>
+
+    <script type="text/x-handlebars-template" id="save-account-template">
+        <header class="page-header">
+            <ul>
+                <li><a href="javascript:;" class="action-turn-back"><span class="fa fa-arrow-circle-left"></span> Turn Back</a></li>
+            </ul>
+        </header>
+        <div class="content">
+            <form>
+                <fieldset>
+                    <legend>User Information</legend>
+                    <div class="form-item">
+                        <label class="form-item-label">Account Name</label>
+                        <input type="text" name="account_name" />
+                    </div>
+                    <div class="form-item">
+                        <label class="form-item-label">Username</label>
+                        <input type="text" name="username" />
+                    </div>
+                    <div class="form-item">
+                        <label class="form-item-label">Password</label>
+                        <input type="text" name="password" />
+                        <div class="password-buttons">
+                            <a href="javascript:;" class="action-generate-password"><span class="fa fa-repeat"></span> Generate Password</a>
+                        </div>
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <legend>Note</legend>
+                    <div class="form-item">
+                        <textarea rows="5" name="note"></textarea>
+                    </div>
+                </fieldset>
+                <div class="form-item">
+                    <a href="javascript:;" class="submit-btn action-save"><span class="fa fa-save"></span> Save</a>
+                </div>
+            </form>
+        </div>
+    </script>
+
+    <script type="text/x-handlebars-template" id="note-template">
+        <header class="page-header">
+            <ul>
+                <li><a href="javascript:;" class="action-turn-back"><span class="fa fa-arrow-circle-left"></span> Turn Back</a></li>
+            </ul>
+        </header>
+        <div class="content">
+            <div class="note">{{note}}</div>
+        </div>
+    </script>
+
+    <script type="text/javascript" src="assets/js/password-generator.min.js"></script>
+    <script type="text/javascript" src="assets/js/dropbox-datastores-1.0.0.js"></script>
+    <script type="text/javascript" src="assets/js/jquery-2.1.0.min.js"></script>
+    <script type="text/javascript" src="assets/js/jquery.magnific-popup.min.js"></script>
+    <script type="text/javascript" src="assets/js/underscore-min.js"></script>
+    <script type="text/javascript" src="assets/js/handlebars-1.1.2.js"></script>
+    <script type="text/javascript" src="assets/js/backbone-min.js"></script>
+    <script type="text/javascript" src="assets/js/backbone.localStorage-min.js"></script>
+    <script type="text/javascript" src="assets/js/backbone.dropboxDatastore.min.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+</body>
+</html>

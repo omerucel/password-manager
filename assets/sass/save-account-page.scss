@@ -1,0 +1,20 @@
+.save-account-page{
+  .content{
+    width: 100%;
+    top: 40px;
+    bottom: 0px;
+    overflow-y: auto;
+  }
+
+  .password-buttons{
+    margin-top: 10px;
+    @include clearfix;
+
+    .action-generate-password, .action-copy-password{
+      float: left;
+      margin-right: 10px;
+      @include orange-button(13);
+      padding: 5px 10px;
+    }
+  }
+}
