@@ -8,13 +8,13 @@
 <body>
     <div id="app"></div>
 
-    <script type="text/x-handlebars-template" id="login-template">
+    <script type="text/template" id="login-template">
         <div class="content">
             <a href="javascript:;" class="action-login"><span class="fa fa-sign-in"></span> Login With Dropbox</a>
         </div>
     </script>
 
-    <script type="text/x-handlebars-template" id="master-password-login-template">
+    <script type="text/template" id="master-password-login-template">
         <div class="content">
             <form>
                 <div class="form-item">
@@ -28,7 +28,7 @@
         </div>
     </script>
 
-    <script type="text/x-handlebars-template" id="home-template">
+    <script type="text/template" id="home-template">
         <div id="copy-popup" class="white-popup mfp-hide">
             <div class="username">
                 <strong>Username</strong> <span></span>
@@ -53,8 +53,8 @@
         </section>
     </script>
 
-    <script type="text/x-handlebars-template" id="account-template">
-        <div class="account-name">{{accountName}}</div>
+    <script type="text/template" id="account-template">
+        <div class="account-name"><%= accountName %></div>
         <div class="actions">
             <ul class="copy-menu">
                 <li><a href="javascript:;" class="action-open-copy-popup"><span class="fa fa-clipboard"></span> Copy</a></li>
@@ -67,7 +67,7 @@
         </div>
     </script>
 
-    <script type="text/x-handlebars-template" id="save-account-template">
+    <script type="text/template" id="save-account-template">
         <header class="page-header">
             <ul>
                 <li><a href="javascript:;" class="action-turn-back"><span class="fa fa-arrow-circle-left"></span> Turn Back</a></li>
@@ -79,15 +79,15 @@
                     <legend>User Information</legend>
                     <div class="form-item">
                         <label class="form-item-label">Account Name</label>
-                        <input type="text" name="account_name" value="{{ accountName }}" />
+                        <input type="text" name="account_name" value="<%= accountName %>" />
                     </div>
                     <div class="form-item">
                         <label class="form-item-label">Username</label>
-                        <input type="text" name="username" value="{{ username }}" />
+                        <input type="text" name="username" value="<%= username %>" />
                     </div>
                     <div class="form-item">
                         <label class="form-item-label">Password</label>
-                        <input type="text" name="password" value="{{ password }}" />
+                        <input type="text" name="password" value="<%= password %>" />
                         <div class="password-buttons">
                             <a href="javascript:;" class="action-generate-password"><span class="fa fa-repeat"></span> Generate Password</a>
                         </div>
@@ -96,7 +96,7 @@
                 <fieldset>
                     <legend>Note</legend>
                     <div class="form-item">
-                        <textarea rows="5" name="note">{{ note }}</textarea>
+                        <textarea rows="5" name="note"><%= note %></textarea>
                     </div>
                 </fieldset>
                 <div class="form-item">
@@ -106,14 +106,14 @@
         </div>
     </script>
 
-    <script type="text/x-handlebars-template" id="note-template">
+    <script type="text/template" id="note-template">
         <header class="page-header">
             <ul>
                 <li><a href="javascript:;" class="action-turn-back"><span class="fa fa-arrow-circle-left"></span> Turn Back</a></li>
             </ul>
         </header>
         <div class="content">
-            <div class="note">{{note}}</div>
+            <div class="note"><%= note %></div>
         </div>
     </script>
 
@@ -123,7 +123,6 @@
     <script type="text/javascript" src="assets/js/jquery-2.1.0.min.js"></script>
     <script type="text/javascript" src="assets/js/jquery.magnific-popup.min.js"></script>
     <script type="text/javascript" src="assets/js/underscore-min.js"></script>
-    <script type="text/javascript" src="assets/js/handlebars-1.1.2.js"></script>
     <script type="text/javascript" src="assets/js/backbone-min.js"></script>
     <script type="text/javascript" src="assets/js/backbone.dropboxDatastore.min.js"></script>
     <script type="text/javascript" src="app.js"></script>

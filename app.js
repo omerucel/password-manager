@@ -9,6 +9,9 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
         Collections: {},
         Instances: {},
         Helpers: {
+            compiledTemplate: function(templateId) {
+                return _.template($(templateId).html());
+            },
             requireAuthentication: function(callback) {
                 if (App.Instances.dropboxClient.isAuthenticated()) {
                     if (!App.Instances.masterPassword) {
@@ -86,7 +89,7 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
     App.Views.Login = Backbone.View.extend({
         className: 'login-page',
 
-        template: Handlebars.compile($('#login-template').html()),
+        template: App.Helpers.compiledTemplate('#login-template'),
 
         events: {
             "click .action-login": "actionLogin"
@@ -113,7 +116,7 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
     App.Views.MasterPassword = Backbone.View.extend({
         className: 'master-password-login-page',
 
-        template: Handlebars.compile($('#master-password-login-template').html()),
+        template: App.Helpers.compiledTemplate('#master-password-login-template'),
 
         events: {
             "click .action-login": "actionLogin"
@@ -134,7 +137,7 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
     App.Views.Account = Backbone.View.extend({
         className: 'account',
 
-        template: Handlebars.compile($('#account-template').html()),
+        template: App.Helpers.compiledTemplate('#account-template'),
 
         events: {
             "click .action-open-copy-popup": "actionOpenCopyPopup",
@@ -179,7 +182,7 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
     App.Views.Home = Backbone.View.extend({
         className: 'home-page',
 
-        template: Handlebars.compile($('#home-template').html()),
+        template: App.Helpers.compiledTemplate('#home-template'),
 
         initialize: function(){
             this.listenTo(this.collection, 'add', this.addOne);
@@ -244,10 +247,7 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
     App.Views.SaveAccount = Backbone.View.extend({
         className: 'save-account-page',
 
-        template: Handlebars.compile($('#save-account-template').html()),
-
-        initialize: function(){
-        },
+        template: App.Helpers.compiledTemplate('#save-account-template'),
 
         events: {
             'click .action-turn-back': 'actionTurnBack',
@@ -296,7 +296,7 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
     App.Views.Note = Backbone.View.extend({
         className: 'note-page',
 
-        template: Handlebars.compile($('#note-template').html()),
+        template: App.Helpers.compiledTemplate('#note-template'),
 
         events: {
             'click .action-turn-back': 'actionTurnBack'
