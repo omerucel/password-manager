@@ -24,7 +24,7 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
                 }
             },
             encrypt: function(value){
-                return CryptoJS.RC4.encrypt(value, App.Instances.masterPassword).toString(CryptoJS.enc.Utf8);
+                return CryptoJS.RC4.encrypt(value, App.Instances.masterPassword).toString();
             },
             decrypt: function(value) {
                 return CryptoJS.RC4.decrypt(value, App.Instances.masterPassword).toString(CryptoJS.enc.Utf8);
