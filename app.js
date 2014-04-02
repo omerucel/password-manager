@@ -332,68 +332,69 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
             "save-account/:id": "saveAccount",
             "note/:id": "note",
             "*actions": "defaultRoute"
+        },
+
+        login: function(){
+            console.log('route:login');
+
+            App.Instances.masterPassword = null;
+            if (App.Instances.dropboxClient.isAuthenticated()) {
+                App.Instances.dropboxClient.signOff();
+            }
+            var view = new App.Views.Login();
+            $('#app').html(view.render().el);
+        },
+
+        masterPasswordLogin: function(){
+            console.log('route:masterPasswordLogin');
+
+            var view = new App.Views.MasterPassword();
+            $('#app').html(view.render().el);
+        },
+
+        home: function(){
+            console.log('route:home');
+
+            App.Helpers.requireAuthentication(function(){
+                var view = new App.Views.Home({ collection: App.Instances.accountsCollection });
+                $('#app').html(view.render().el);
+            });
+        },
+
+        saveAccount: function(accountId){
+            console.log('route:saveAccount');
+
+            App.Helpers.requireAuthentication(function(){
+                var account = App.Instances.accountsCollection.get(accountId);
+                if (account == null) {
+                    account = new App.Models.Account();
+                }
+
+                var view = new App.Views.SaveAccount({ collection: App.Instances.accountsCollection, model: account });
+                $('#app').html(view.render().el);
+            });
+        },
+
+        note: function(accountId){
+            console.log('route:note');
+
+            var currentInstance = this;
+            App.Helpers.requireAuthentication(function(){
+                var account = App.Instances.accountsCollection.get(accountId);
+                if (account == null) {
+                    currentInstance.navigate('home', {trigger: true, replace: true});
+                } else {
+                    var view = new App.Views.Note({model: account});
+                    $('#app').html(view.render().el);
+                }
+            });
+        },
+
+        defaultRoute: function(actions){
+            this.navigate('home', {trigger: true, replace: true});
         }
     });
 
     App.Instances.router = new App.Router();
-    App.Instances.router.on('route:login', function(){
-        console.log('route:login');
-
-        App.Instances.masterPassword = null;
-        if (App.Instances.dropboxClient.isAuthenticated()) {
-            App.Instances.dropboxClient.signOff();
-        }
-        var view = new App.Views.Login();
-        $('#app').html(view.render().el);
-    });
-
-    App.Instances.router.on('route:masterPasswordLogin', function(){
-        console.log('route:masterPasswordLogin');
-
-        var view = new App.Views.MasterPassword();
-        $('#app').html(view.render().el);
-    });
-
-    App.Instances.router.on('route:home', function(){
-        console.log('route:home');
-
-        App.Helpers.requireAuthentication(function(){
-            var view = new App.Views.Home({ collection: App.Instances.accountsCollection });
-            $('#app').html(view.render().el);
-        });
-    });
-
-    App.Instances.router.on('route:saveAccount', function(accountId){
-        console.log('route:saveAccount');
-
-        App.Helpers.requireAuthentication(function(){
-            var account = App.Instances.accountsCollection.get(accountId);
-            if (account == null) {
-                account = new App.Models.Account();
-            }
-
-            var view = new App.Views.SaveAccount({ collection: App.Instances.accountsCollection, model: account });
-            $('#app').html(view.render().el);
-        });
-    });
-
-    App.Instances.router.on('route:note', function(accountId){
-        console.log('route:note');
-
-        App.Helpers.requireAuthentication(function(){
-            var account = App.Instances.accountsCollection.get(accountId);
-            if (account == null) {
-                App.Instances.router.navigate('home', {trigger: true, replace: true});
-            } else {
-                var view = new App.Views.Note({model: account});
-                $('#app').html(view.render().el);
-            }
-        });
-    });
-
-    App.Instances.router.on('route:defaultRoute', function(actions){
-        App.Instances.router.navigate('home', {trigger: true, replace: true});
-    });
-
     Backbone.history.start();
 })();
