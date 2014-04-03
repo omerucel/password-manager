@@ -170,7 +170,8 @@ var AZURE_APP_KEY = "eMtFkZdcoHkkisgAliIeejefVmbpfQ82";
         template: App.Helpers.compiledTemplate('#master-password-login-template'),
 
         events: {
-            "click .action-login": "actionLogin"
+            "click .action-login": "actionLogin",
+            "submit form": "actionLogin"
         },
 
         render: function(){
