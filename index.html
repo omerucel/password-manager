@@ -17,10 +17,10 @@
 
     <script type="text/template" id="master-password-login-template">
         <div class="content">
-            <form>
+            <form onsubmit="return false;">
                 <div class="form-item">
                     <label class="form-item-label">Master Password</label>
-                    <input type="password" name="master_password" />
+                    <input type="password" name="master_password" autocapitalize="off" />
                 </div>
                 <div class="form-item">
                     <a href="javascript:;" class="action-login"><span class="fa fa-unlock"></span> Unlock</a>
@@ -39,7 +39,7 @@
             </div>
         </div>
         <section class="search-bar">
-            <input type="text" name="q" placeholder="Search an account" autocomplete="off" />
+            <input type="text" name="q" placeholder="Search an account" autocomplete="off" autocapitalize="off" />
             <span class="fa fa-search"></span>
         </section>
         <div class="content">
@@ -80,15 +80,15 @@
                     <legend>User Information</legend>
                     <div class="form-item">
                         <label class="form-item-label">Account Name</label>
-                        <input type="text" name="account_name" value="<%= accountName %>" />
+                        <input type="text" name="account_name" value="<%= accountName %>" autocapitalize="off" />
                     </div>
                     <div class="form-item">
                         <label class="form-item-label">Username</label>
-                        <input type="text" name="username" value="<%= username %>" />
+                        <input type="text" name="username" value="<%= username %>" autocapitalize="off" />
                     </div>
                     <div class="form-item">
                         <label class="form-item-label">Password</label>
-                        <input type="text" name="password" value="<%= password %>" />
+                        <input type="text" name="password" value="<%= password %>" autocapitalize="off" />
                         <div class="password-buttons">
                             <a href="javascript:;" class="action-generate-password"><span class="fa fa-repeat"></span> Generate Password</a>
                         </div>
@@ -121,7 +121,7 @@
     <script type="text/javascript" src="assets/js/rc4.js"></script>
     <script type="text/javascript" src="assets/js/password-generator.min.js"></script>
     <script type="text/javascript" src="assets/js/jquery-2.1.0.min.js"></script>
-    <script type="text/javascript" src="assets/js/MobileServices.Web-1.1.3.min.js"></script>
+    <script type="text/javascript" src="assets/js/MobileServices.Web-1.1.5.min.js"></script>
     <script type="text/javascript" src="assets/js/jquery.magnific-popup.min.js"></script>
     <script type="text/javascript" src="assets/js/underscore-min.js"></script>
     <script type="text/javascript" src="assets/js/backbone-min.js"></script>
