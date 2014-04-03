@@ -1,4 +1,5 @@
-var DROPBOX_KEY = 'y2wcqthd1fi73hr';
+var AZURE_URL = "https://password-manager.azure-mobile.net/";
+var AZURE_APP_KEY = "eMtFkZdcoHkkisgAliIeejefVmbpfQ82";
 
 (function(){
     // Application
@@ -13,14 +14,23 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
                 return _.template($(templateId).html());
             },
             requireAuthentication: function(callback) {
-                if (App.Instances.dropboxClient.isAuthenticated()) {
-                    if (!App.Instances.masterPassword) {
+                if (App.Instances.windowsAzure.currentUser !== null) {
+                    if (App.Instances.masterPassword == null) {
                         App.Instances.router.navigate('master-password-login', {trigger: true, reload: true});
                     } else {
                         callback();
                     }
                 } else {
-                    App.Instances.router.navigate('login', {trigger: true, reload: true});
+                    if (localStorage.loggedInUser) {
+                        if (App.Instances.masterPassword == null) {
+                            App.Instances.router.navigate('master-password-login', {trigger: true, reload: true});
+                        } else {
+                            App.Instances.windowsAzure.currentUser = JSON.parse(localStorage.loggedInUser);
+                            callback();
+                        }
+                    } else {
+                        App.Instances.router.navigate('login', {trigger: true, reload: true});
+                    }
                 }
             },
             encrypt: function(value){
@@ -40,6 +50,42 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
                 username: '',
                 password: '',
                 note: ''
+            }
+        },
+
+        sync: function(method, model, options) {
+            if (method == 'create') {
+                App.Instances.windowsAzure.getTable('Account').insert({
+                    accountName: model.attributes.accountName,
+                    username: model.attributes.username,
+                    password: model.attributes.password,
+                    note: model.attributes.note
+                }).done(function(result){
+                    model.set('id', result.id);
+                    options.success();
+                }, function(error){
+                    options.error(error);
+                });
+            } else if (method == 'update') {
+                App.Instances.windowsAzure.getTable('Account').update({
+                    id: model.attributes.id,
+                    accountName: model.attributes.accountName,
+                    username: model.attributes.username,
+                    password: model.attributes.password,
+                    note: model.attributes.note
+                }).done(function(result){
+                    options.success();
+                }, function(error){
+                    options.error(error);
+                });
+            } else if (method == 'delete') {
+                App.Instances.windowsAzure.getTable('Account').del({
+                    id: model.attributes.id
+                }).done(function(){
+                    options.success();
+                }, function(error){
+                    options.error(error);
+                });;
             }
         },
 
@@ -72,16 +118,23 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
     App.Collections.Accounts = Backbone.Collection.extend({
         model: App.Models.Account,
 
-        dropboxDatastore: new Backbone.DropboxDatastore('AccountsCollection', {
-            datastoreId: 'accounts'
-        }),
-
-        initialize: function(){
-            this.dropboxDatastore.syncCollection(this);
-        },
-
         comparator: function(account){
             return account.get('accountName');
+        },
+
+        sync: function(method, model, options){
+            if (method == 'read') {
+                App.Instances.windowsAzure
+                    .getTable('Account')
+                    .where({})
+                    .select('id', 'accountName', 'username', 'password', 'note')
+                    .read()
+                    .done(function(results){
+                        options.success(results);
+                    }, function(error){
+                        options.error(error);
+                    });
+            }
         }
     });
 
@@ -101,13 +154,11 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
         },
 
         actionLogin: function (){
-            App.Instances.dropboxClient.authenticate(function(error){
-                if (error) {
-                    alert('Authentication error: ' + error);
-                    return;
-                }
-
+            App.Instances.windowsAzure.login('google').done(function(currentUser){
+                localStorage.loggedInUser = JSON.stringify(currentUser);
                 App.Instances.router.navigate('home', {trigger: true, replace: true});
+            }, function(error){
+                alert('Authentication error: ' + error);
             });
         }
     });
@@ -190,6 +241,7 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
             this.listenTo(this.collection, 'all', this.render);
 
             this.collection.fetch();
+            this.collection.sort();
         },
 
         events: {
@@ -274,17 +326,22 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
             var encryptedPassword = App.Helpers.encrypt(this.$('input[name=password]').val());
             var encryptedNote = App.Helpers.encrypt(this.$('textarea[name=note]').val());
 
-            this.model.set('accountName', this.$('input[name=account_name]').val());
-            this.model.set('username', encryptedUsername);
-            this.model.set('password', encryptedPassword);
-            this.model.set('note', encryptedNote);
+            var attributes = {
+                accountName: this.$('input[name=account_name]').val(),
+                username: encryptedUsername,
+                password: encryptedPassword,
+                note: encryptedNote
+            };
 
             if (!this.collection.contains(this.model)) {
                 this.collection.add(this.model);
             }
 
-            this.model.save();
-            App.Instances.router.navigate('home', {trigger: true, replace: true});
+            this.model.save(attributes, {
+                success: function(){
+                    App.Instances.router.navigate('home', {trigger: true, replace: true});
+                }
+            });
         },
 
         actionGeneratePassword: function() {
@@ -312,14 +369,6 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
         }
     });
 
-    // Dropbox Client
-    App.Instances.dropboxClient = new Dropbox.Client({key: DROPBOX_KEY});
-    App.Instances.dropboxClient.authenticate({interactive: false});
-    Backbone.DropboxDatastore.client = App.Instances.dropboxClient;
-
-    // Collections Instances
-    App.Instances.accountsCollection = new App.Collections.Accounts();
-
     /**
      * Router
      */
@@ -338,8 +387,9 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
             console.log('route:login');
 
             App.Instances.masterPassword = null;
-            if (App.Instances.dropboxClient.isAuthenticated()) {
-                App.Instances.dropboxClient.signOff();
+            if (App.Instances.windowsAzure.currentUser !== null) {
+                App.Instances.windowsAzure.logout();
+                localStorage.loggedInUser = null;
             }
             var view = new App.Views.Login();
             $('#app').html(view.render().el);
@@ -394,6 +444,13 @@ var DROPBOX_KEY = 'y2wcqthd1fi73hr';
             this.navigate('home', {trigger: true, replace: true});
         }
     });
+
+    // Instances
+    App.Instances.windowsAzure = new WindowsAzure.MobileServiceClient(
+        AZURE_URL,
+        AZURE_APP_KEY
+    );
+    App.Instances.accountsCollection = new App.Collections.Accounts();
 
     App.Instances.router = new App.Router();
     Backbone.history.start();
