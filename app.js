@@ -323,9 +323,14 @@ var AZURE_APP_KEY = "eMtFkZdcoHkkisgAliIeejefVmbpfQ82";
         },
 
         actionSave: function(){
-            var currentInstance = this;
-            this.$('.action-save').attr('disabled', 'disabled');
-            currentInstance.$('.action-save').text('Please wait...');
+            var button = this.$('.action-save');
+            if (button.hasClass('disabled')) {
+                return false;
+            }
+
+            button.addClass('disabled');
+            button.attr('disabled', 'disabled');
+            button.text('Please wait...');
 
             var encryptedUsername = App.Helpers.encrypt(this.$('input[name=username]').val());
             var encryptedPassword = App.Helpers.encrypt(this.$('input[name=password]').val());
@@ -344,9 +349,17 @@ var AZURE_APP_KEY = "eMtFkZdcoHkkisgAliIeejefVmbpfQ82";
 
             this.model.save(attributes, {
                 success: function(){
-                    currentInstance.$('.action-save').removeAttr('disabled');
-                    currentInstance.$('.action-save').text('Save');
+                    button.removeAttr('disabled');
+                    button.removeClass('disabled');
+                    button.text('Save');
                     App.Instances.router.navigate('home', {trigger: true, replace: true});
+                },
+                error: function(error){
+                    button.removeAttr('disabled');
+                    button.removeClass('disabled');
+                    button.text('Save');
+                    console.log(error);
+                    alert('An error occurred.');
                 }
             });
         },
