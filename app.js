@@ -323,6 +323,10 @@ var AZURE_APP_KEY = "eMtFkZdcoHkkisgAliIeejefVmbpfQ82";
         },
 
         actionSave: function(){
+            var currentInstance = this;
+            this.$('.action-save').attr('disabled', 'disabled');
+            currentInstance.$('.action-save').text('Please wait...');
+
             var encryptedUsername = App.Helpers.encrypt(this.$('input[name=username]').val());
             var encryptedPassword = App.Helpers.encrypt(this.$('input[name=password]').val());
             var encryptedNote = App.Helpers.encrypt(this.$('textarea[name=note]').val());
@@ -340,6 +344,8 @@ var AZURE_APP_KEY = "eMtFkZdcoHkkisgAliIeejefVmbpfQ82";
 
             this.model.save(attributes, {
                 success: function(){
+                    currentInstance.$('.action-save').removeAttr('disabled');
+                    currentInstance.$('.action-save').text('Save');
                     App.Instances.router.navigate('home', {trigger: true, replace: true});
                 }
             });
@@ -347,6 +353,7 @@ var AZURE_APP_KEY = "eMtFkZdcoHkkisgAliIeejefVmbpfQ82";
 
         actionGeneratePassword: function() {
             this.$('input[name=password]').val(generatePassword(12, false));
+            return false;
         }
     });
 
